@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:get/get.dart';
 
 void main() async {
   // Fireabse初期化
@@ -15,10 +16,16 @@ void main() async {
   runApp(MyApp());
 }
 
+class Controller extends GetxController {
+  //(1) 選択されたタブの番号
+  var selected = 0.obs;
+}
+
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       // アプリ名
       title: 'Memoria',
       theme: ThemeData(
@@ -94,7 +101,7 @@ class _LoginPageState extends State<LoginPage> {
                       // チャット画面に遷移＋ログイン画面を破棄
                       await Navigator.of(context).pushReplacement(
                         MaterialPageRoute(builder: (context) {
-                          return ChatPage(result.user!);
+                          return ScreenTransition(result.user!);
                         }),
                       );
                     } catch (e) {
@@ -124,7 +131,7 @@ class _LoginPageState extends State<LoginPage> {
                       // チャット画面に遷移＋ログイン画面を破棄
                       await Navigator.of(context).pushReplacement(
                         MaterialPageRoute(builder: (context) {
-                          return ChatPage(result.user!);
+                          return ScreenTransition(result.user!);
                         }),
                       );
                     } catch (e) {
@@ -139,6 +146,112 @@ class _LoginPageState extends State<LoginPage> {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+//画面遷移中央Widget
+class ScreenTransition extends StatelessWidget {
+  ScreenTransition(this.user);
+  final User user;
+
+  @override
+  Widget build(BuildContext context) {
+    //(2) PageViewとBottomBarを連動させるための準備
+    final PageController pager = PageController();
+    var state = Get.put(Controller());
+
+    return MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: Scaffold(
+          appBar: AppBar(
+            title: const Text("Bottom Menu"),
+          ),
+          //(3) ページ切替機構
+          body: PageView(
+            controller: pager,
+            children: <Widget>[
+              ChatPage(user),
+              const Clock(),
+              const Secret(),
+            ],
+            onPageChanged: (int i) {
+              state.selected.value = i;
+            },
+          ),
+          //(4) 下のナビゲーションバー
+          bottomNavigationBar: Obx(() => BottomNavigationBar(
+                items: const [
+                  BottomNavigationBarItem(
+                      icon: Icon(Icons.home), label: 'Home'),
+                  BottomNavigationBarItem(
+                      icon: Icon(Icons.access_alarm_outlined), label: 'Clock'),
+                  BottomNavigationBarItem(
+                      icon: Icon(Icons.vpn_key), label: 'Secret'),
+                ],
+                currentIndex: state.selected.value,
+                onTap: (int i) {
+                  state.selected.value = i;
+                  pager.jumpToPage(i);
+                },
+              )),
+        ));
+  }
+}
+
+//class Home extends StatelessWidget {
+//  const Home({Key? key}) : super(key: key);
+//
+//  @override
+//  Widget build(BuildContext context) {
+//    return Container(
+//      child: const Text('Home',
+//          style: TextStyle(color: Colors.white, fontSize: 32.0)),
+//      alignment: Alignment.center,
+//      decoration: const BoxDecoration(
+//        gradient: LinearGradient(
+//            begin: Alignment.topRight,
+//            end: Alignment.bottomLeft,
+//            colors: [Colors.blueAccent, Colors.white]),
+//      ),
+//    );
+//  }
+//}
+
+class Clock extends StatelessWidget {
+  const Clock({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: const Text('Clock',
+          style: TextStyle(color: Colors.white, fontSize: 32.0)),
+      alignment: Alignment.center,
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+            begin: Alignment.topRight,
+            end: Alignment.bottomLeft,
+            colors: [Colors.green, Colors.white]),
+      ),
+    );
+  }
+}
+
+class Secret extends StatelessWidget {
+  const Secret({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: const Text('Secret',
+          style: TextStyle(color: Colors.white, fontSize: 32.0)),
+      alignment: Alignment.center,
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+            begin: Alignment.topRight,
+            end: Alignment.bottomLeft,
+            colors: [Colors.purpleAccent, Colors.white]),
       ),
     );
   }
