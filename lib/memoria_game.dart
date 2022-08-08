@@ -21,35 +21,33 @@ import './recommendation.dart';
 import './screen_transition.dart';
 import './setting.dart';
 
-void main() {
-  // Fireabse初期化
-  WidgetsFlutterBinding.ensureInitialized();
-  Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-  runApp(const MyApp());
-}
-
-class Controller extends GetxController {
-  //(1) 選択されたタブの番号
-  var selected = 0.obs;
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
-
+class Memoria_Game extends StatefulWidget {
+  final User user;
+  final List<List> wordlist;
+  Memoria_Game(this.user, this.wordlist);
   @override
+  _Memoria_GameState createState() => _Memoria_GameState();
+}
+
+class _Memoria_GameState extends State<Memoria_Game> {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      // アプリ名
-      title: 'Memoria',
-      theme: ThemeData(
-        // テーマカラー
-        primarySwatch: Colors.blue,
+      home: Scaffold(
+        appBar: AppBar(title: Text('Memoria Game'), actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.logout),
+            onPressed: () {
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(builder: (context) {
+                  return BookShelf(widget.user);
+                }),
+              );
+            },
+          ),
+        ]),
+        //body: _screens[_selectedIndex],
       ),
-      // ログイン画面を表示
-      home: const LoginPage(),
     );
   }
 }
