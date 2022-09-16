@@ -35,12 +35,15 @@ class _AddBookCardsPageState extends State<AddBookCardsPage> {
   String nameText = '';
   String commentText = '';
   String tagText = '';
+  String newTagText = '';
+
+  var isSelectedItem = "None";
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('単語帳を追加'),
+        title: Text('カードを追加'),
       ),
       body: Center(
         child: Container(
@@ -74,14 +77,26 @@ class _AddBookCardsPageState extends State<AddBookCardsPage> {
               //   },
               // ),
               TextFormField(
-                decoration: InputDecoration(labelText: '名前'),
+                decoration: InputDecoration(labelText: '問題'),
                 // 複数行のテキスト入力
                 keyboardType: TextInputType.multiline,
                 // 最大3行
                 maxLines: 3,
                 onChanged: (String value) {
                   setState(() {
-                    nameText = value;
+                    questionText = value;
+                  });
+                },
+              ),
+              TextFormField(
+                decoration: InputDecoration(labelText: '答え'),
+                // 複数行のテキスト入力
+                keyboardType: TextInputType.multiline,
+                // 最大3行
+                maxLines: 3,
+                onChanged: (String value) {
+                  setState(() {
+                    answerText = value;
                   });
                 },
               ),
@@ -97,15 +112,68 @@ class _AddBookCardsPageState extends State<AddBookCardsPage> {
                   });
                 },
               ),
+
+              Row(children: <Widget>[
+                Text('タグ'),
+                Container(height: 20, width: 20),
+                Flexible(
+                  child: StreamBuilder<QuerySnapshot>(
+                      stream: FirebaseFirestore.instance
+                          .collection('books')
+                          .doc(widget.bookInfo.id)
+                          .collection(widget.bookInfo['name'])
+                          .orderBy('date')
+                          // .endBefore(["中枢神経", "questoion"])
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          if (snapshot.data != null) {
+                            final List<DocumentSnapshot> documents =
+                                snapshot.data!.docs;
+                            print("OKK1");
+                            var tagList = <String>["English"];
+                            var _selectedValue = "English";
+                            for (var value in documents) {
+                              tagList.add(value['tag']);
+                            }
+                            // tagList.toSet().toList();
+                            tagList = tagList.toSet().toList();
+                            print(tagList);
+                            return DropdownButton<String>(
+                              value: _selectedValue,
+                              items: tagList
+                                  .map((String list) => DropdownMenuItem(
+                                      value: list, child: Text(list)))
+                                  .toList(),
+                              onChanged: (String? value) {
+                                setState(() {
+                                  _selectedValue = value!;
+                                  print(value);
+                                  tagText = _selectedValue;
+                                  print("OKK2");
+                                });
+                              },
+                            );
+                          } else {
+                            return Container();
+                          }
+                        }
+                        return const Center(
+                          child: Text('読み込み中...'),
+                        );
+                      }),
+                ),
+              ]),
+
               TextFormField(
-                decoration: InputDecoration(labelText: 'タグ'),
+                decoration: InputDecoration(labelText: '新しいタグ'),
                 // 複数行のテキスト入力
                 keyboardType: TextInputType.multiline,
                 // 最大3行
                 maxLines: 3,
-                onChanged: (String value) {
+                onChanged: (String? value) {
                   setState(() {
-                    tagText = value;
+                    newTagText = value!;
                   });
                 },
               ),
@@ -113,7 +181,7 @@ class _AddBookCardsPageState extends State<AddBookCardsPage> {
               Container(
                 width: double.infinity,
                 child: ElevatedButton(
-                  child: Text('単語帳を追加'),
+                  child: Text('カードを追加'),
                   onPressed: () async {
                     final date =
                         DateTime.now().toLocal().toIso8601String(); // 現在の日時
@@ -121,16 +189,20 @@ class _AddBookCardsPageState extends State<AddBookCardsPage> {
                     // 投稿メッセージ用ドキュメント作成
                     await FirebaseFirestore.instance
                         .collection('books') // コレクションID指定
+                        .doc(widget.bookInfo.id)
+                        .collection(widget.bookInfo['name'])
                         .doc() // ドキュメントID自動生成
                         .set({
                       // 'question': questionText,
                       // 'answer': answerText,
                       'email': email,
                       'comment': commentText,
-                      'tag': tagText,
+                      'tag': newTagText != "" ? newTagText : tagText,
                       'date': date,
                       'isChecked': false,
-                      'name': nameText,
+                      'question': questionText,
+                      'answer': answerText,
+                      'stage': 1,
                     });
                     // 1つ前の画面に戻る
                     Navigator.of(context).pop();

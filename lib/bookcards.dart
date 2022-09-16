@@ -34,8 +34,11 @@ class BookCards extends StatefulWidget {
 class _BookCardsState extends State<BookCards> {
   @override
   Widget build(BuildContext context) {
-    print("OK1");
+    // print("OK1");
     return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.bookInfo['name']),
+      ),
       body: Column(
         children: <Widget>[
           Container(
@@ -52,14 +55,32 @@ class _BookCardsState extends State<BookCards> {
                   .collection('books')
                   .doc(widget.bookInfo.id)
                   .collection(widget.bookInfo['name'])
-                  .orderBy('date')
+                  //.orderBy('date')
+                  //.startAt([2022,"date"])
+                  //.startAt(["中枢神経", "question"])
                   .snapshots(),
+
               builder: (context, snapshot) {
                 // データが取得できた場合
                 if (snapshot.hasData) {
+                  print("Check1");
                   final List<DocumentSnapshot> documents = snapshot.data!.docs;
+                  /*
+stream: FirebaseFirestore.instance
+    .collection('books')
+    .doc(widget.bookInfo.id)
+    .collection(widget.bookInfo['name'])
+    .orderBy('date')
+    .snapshots(),
+builder: (context, snapshot) {
+  // データが取得できた場合
+  if (snapshot.hasData) {
+    final List<DocumentSnapshot> documents = snapshot.data!.docs;
+    */
                   //final List<DocumentSnapshot> newDocuments = //indexを数字で指定するから無理だぁ〜！
-                  print("OK2");
+                  // print("OK2");
+                  // print(documents);
+                  // print(documents[0]["color"]);
                   // print(documents[documents['books'].doc(widget.bookInfo.id)
                   // .collection(widget.bookInfo['name'])][0]['color']);
                   // 取得した投稿メッセージ一覧を元にリスト表示
@@ -68,157 +89,182 @@ class _BookCardsState extends State<BookCards> {
                       itemCount: documents.length,
                       itemBuilder: (context, int index) {
                         //ここはdocumentsの中身の構造なのかな？Todo!
-                        print('OKKKKK');
-                        if (documents['Noutan']['comment'] ==
-                            widget.user.email) {
+                        // print('OKKKKK');
+                        if (documents[index]['email'] == widget.user.email) {
                           //ここを何とかしたい
                           print("OK3");
                           return Slidable(
-                              // enabled: false, // falseにすると文字通りスライドしなくなります
-                              // closeOnScroll: false, // *2
-                              // dragStartBehavior: DragStartBehavior.start,
-                              key: UniqueKey(),
-                              startActionPane: ActionPane(
-                                extentRatio: 0.2,
-                                motion: const ScrollMotion(),
-                                children: [
-                                  documents[index]['isChecked']
-                                      ? SlidableAction(
-                                          onPressed: (_) {
-                                            FirebaseFirestore.instance
-                                                .collection('books')
-                                                .doc(widget.bookInfo.id)
-                                                .collection(
-                                                    widget.bookInfo['name'])
-                                                .doc(documents[index].id)
-                                                .update({'isChecked': false});
-                                          },
-                                          backgroundColor: const Color.fromARGB(
-                                              255, 48, 89, 115), // (4)
-                                          foregroundColor: const Color.fromARGB(
-                                              255, 222, 213, 196),
-                                          icon: Icons.star,
-                                          label: 'Unread',
-                                        )
-                                      : SlidableAction(
-                                          onPressed: (_) {
-                                            FirebaseFirestore.instance
-                                                .collection('books')
-                                                .doc(widget.bookInfo.id)
-                                                .collection(
-                                                    widget.bookInfo['name'])
-                                                .doc(documents[index].id)
-                                                .update({'isChecked': true});
-                                            print("OK4");
-                                          },
-                                          backgroundColor: const Color.fromARGB(
-                                              255, 48, 89, 115), // (4)
-                                          foregroundColor: const Color.fromARGB(
-                                              255, 239, 126, 86),
-                                          icon: Icons.star,
-                                          label: 'Read',
-                                        )
-                                ],
-                              ),
-                              endActionPane: ActionPane(
-                                // (2)
-                                extentRatio: 0.5,
-                                motion: const StretchMotion(), // (5)
-                                dismissible: DismissiblePane(onDismissed: () {
-                                  setState(() {
-                                    //ここ逆だと、一瞬removeAtで消えたやつの次のやつが間違って消される。
-                                    //documentsで消しても大元が消えてないから
+                            // enabled: false, // falseにすると文字通りスライドしなくなります
+                            // closeOnScroll: false, // *2
+                            // dragStartBehavior: DragStartBehavior.start,
+                            key: UniqueKey(),
+                            startActionPane: ActionPane(
+                              extentRatio: 0.2,
+                              motion: const ScrollMotion(),
+                              children: [
+                                documents[index]['isChecked']
+                                    ? SlidableAction(
+                                        onPressed: (_) {
+                                          FirebaseFirestore.instance
+                                              .collection('books')
+                                              .doc(widget.bookInfo.id)
+                                              .collection(
+                                                  widget.bookInfo['name'])
+                                              .doc(documents[index].id)
+                                              .update({'isChecked': false});
+                                        },
+                                        backgroundColor: const Color.fromARGB(
+                                            255, 48, 89, 115), // (4)
+                                        foregroundColor: const Color.fromARGB(
+                                            255, 222, 213, 196),
+                                        icon: Icons.star,
+                                        label: 'Unread',
+                                      )
+                                    : SlidableAction(
+                                        onPressed: (_) {
+                                          FirebaseFirestore.instance
+                                              .collection('books')
+                                              .doc(widget.bookInfo.id)
+                                              .collection(
+                                                  widget.bookInfo['name'])
+                                              .doc(documents[index].id)
+                                              .update({'isChecked': true});
+                                          print("OK4");
+                                        },
+                                        backgroundColor: const Color.fromARGB(
+                                            255, 48, 89, 115), // (4)
+                                        foregroundColor: const Color.fromARGB(
+                                            255, 239, 126, 86),
+                                        icon: Icons.star,
+                                        label: 'Read',
+                                      )
+                              ],
+                            ),
+                            endActionPane: ActionPane(
+                              // (2)
+                              extentRatio: 0.5,
+                              motion: const StretchMotion(), // (5)
+                              dismissible: DismissiblePane(onDismissed: () {
+                                setState(() {
+                                  //ここ逆だと、一瞬removeAtで消えたやつの次のやつが間違って消される。
+                                  //documentsで消しても大元が消えてないから
+                                  FirebaseFirestore.instance
+                                      .collection('books')
+                                      .doc(widget.bookInfo.id)
+                                      .collection(widget.bookInfo['name'])
+                                      .doc(documents[index].id)
+                                      .delete();
+                                  print("OK5");
+                                  documents.removeAt(index);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                          content: Text(
+                                              'message cannot dismissed')));
+                                });
+                              }),
+                              children: [
+                                SlidableAction(
+                                  // (3)
+                                  onPressed: (_) {
+                                    FirebaseFirestore.instance
+                                        .collection('books')
+                                        .doc(widget.bookInfo.id)
+                                        .collection(widget.bookInfo['name'])
+                                        .doc(documents[index].id)
+                                        .update({'isChecked': true});
+                                    print("pressed");
+                                  }, // (4)
+                                  backgroundColor: const Color.fromARGB(
+                                      255, 48, 89, 115), // (4)
+                                  foregroundColor: const Color.fromARGB(
+                                      255, 249, 249, 249), // (4)
+                                  icon: Icons.chair_rounded, // (4)
+                                  label: '詳細',
+                                ),
+                                SlidableAction(
+                                  // (3)
+                                  onPressed: (_) {
+                                    FirebaseFirestore.instance
+                                        .collection('books')
+                                        .doc(widget.bookInfo.id)
+                                        .collection(widget.bookInfo['name'])
+                                        .doc(documents[index].id)
+                                        .update({'isChecked': true});
+                                    print("OK6");
+                                  },
+                                  backgroundColor: const Color.fromARGB(
+                                      255, 48, 89, 115), // (4)
+                                  foregroundColor:
+                                      const Color.fromARGB(255, 222, 213, 196),
+                                  icon: Icons.flag,
+                                  label: 'Flag',
+                                ),
+                                SlidableAction(
+                                  // (3)
+                                  onPressed: (_) {
                                     FirebaseFirestore.instance
                                         .collection('books')
                                         .doc(widget.bookInfo.id)
                                         .collection(widget.bookInfo['name'])
                                         .doc(documents[index].id)
                                         .delete();
-                                    print("OK5");
-                                    documents.removeAt(index);
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(
-                                            content: Text(
-                                                'message cannot dismissed')));
-                                  });
-                                }),
-                                children: [
-                                  SlidableAction(
-                                    // (3)
-                                    onPressed: (_) {
-                                      FirebaseFirestore.instance
-                                          .collection('books')
-                                          .doc(widget.bookInfo.id)
-                                          .collection(widget.bookInfo['name'])
-                                          .doc(documents[index].id)
-                                          .update({'isChecked': true});
-                                    }, // (4)
-                                    backgroundColor: const Color.fromARGB(
-                                        255, 48, 89, 115), // (4)
-                                    foregroundColor: const Color.fromARGB(
-                                        255, 249, 249, 249), // (4)
-                                    icon: Icons.chair_rounded, // (4)
-                                    label: '詳細',
-                                  ),
-                                  SlidableAction(
-                                    // (3)
-                                    onPressed: (_) {
-                                      FirebaseFirestore.instance
-                                          .collection('books')
-                                          .doc(widget.bookInfo.id)
-                                          .collection(widget.bookInfo['name'])
-                                          .doc(documents[index].id)
-                                          .update({'isChecked': true});
-                                      print("OK6");
-                                    },
-                                    backgroundColor: const Color.fromARGB(
-                                        255, 48, 89, 115), // (4)
-                                    foregroundColor: const Color.fromARGB(
-                                        255, 222, 213, 196),
-                                    icon: Icons.flag,
-                                    label: 'Flag',
-                                  ),
-                                  SlidableAction(
-                                    // (3)
-                                    onPressed: (_) {
-                                      FirebaseFirestore.instance
-                                          .collection('books')
-                                          .doc(widget.bookInfo.id)
-                                          .collection(widget.bookInfo['name'])
-                                          .doc(documents[index].id)
-                                          .delete();
-                                    },
-                                    backgroundColor: const Color.fromARGB(
-                                        255, 48, 89, 115), // (4)
-                                    foregroundColor:
-                                        const Color.fromARGB(255, 239, 126, 86),
-                                    icon: Icons.delete,
-                                    label: '消去',
-                                  ),
-                                ],
-                              ),
-                              child: Card(
+                                  },
+                                  backgroundColor: const Color.fromARGB(
+                                      255, 48, 89, 115), // (4)
+                                  foregroundColor:
+                                      const Color.fromARGB(255, 239, 126, 86),
+                                  icon: Icons.delete,
+                                  label: '消去',
+                                ),
+                              ],
+                            ),
+                            child: Card(
                                 child: ListTile(
                                     //leading: documents[index]['image'],
                                     title: Text(documents[index]['question']),
-                                    subtitle: Text(documents[index]['comment']),
+                                    subtitle: Text(documents[index]['comment'] +
+                                        "  stage:" +
+                                        documents[index]['stage'].toString()),
                                     // 自分の投稿メッセージの場合は削除ボタンを表示
-                                    trailing: IconButton(
+                                    leading: IconButton(
                                       icon: const Icon(Icons.thumb_up),
                                       onPressed: () async {
                                         // 投稿メッセージのドキュメントを削除
-                                        FirebaseFirestore.instance
-                                            .collection('books')
-                                            .doc(widget.bookInfo.id)
-                                            .collection(widget.bookInfo['name'])
-                                            .doc(documents[index].id)
-                                            .update({
-                                          'stage': documents[index]['stage'] + 1
-                                        });
-                                        print("OK7");
+                                        if (documents[index]['stage'] < 5) {
+                                          FirebaseFirestore.instance
+                                              .collection('books')
+                                              .doc(widget.bookInfo.id)
+                                              .collection(
+                                                  widget.bookInfo['name'])
+                                              .doc(documents[index].id)
+                                              .update({
+                                            'stage':
+                                                documents[index]['stage'] + 1
+                                          });
+                                          print("OK7");
+                                        }
                                       },
-                                    )),
-                              ));
+                                    ),
+                                    trailing: IconButton(
+                                      icon: const Icon(Icons.thumb_down),
+                                      onPressed: () async {
+                                        // 投稿メッセージのドキュメントを削除
+                                        if (documents[index]['stage'] > 1) {
+                                          FirebaseFirestore.instance
+                                              .collection('books')
+                                              .doc(widget.bookInfo.id)
+                                              .collection(
+                                                  widget.bookInfo['name'])
+                                              .doc(documents[index].id)
+                                              .update({
+                                            'stage':
+                                                documents[index]['stage'] - 1
+                                          });
+                                          print("OK77");
+                                        }
+                                      },
+                                    ))),
+                          );
                         } else {
                           return Slidable(
                             // enabled: false,
