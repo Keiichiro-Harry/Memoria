@@ -36,7 +36,7 @@ class _AddBookCardsPageState extends State<AddBookCardsPage> {
   String commentText = '';
   String tagText = '';
   String newTagText = '';
-
+  var _selectedValue = ""; //ここに移動させたらちゃんと反映されるようになった！
   var isSelectedItem = "None";
 
   @override
@@ -131,8 +131,7 @@ class _AddBookCardsPageState extends State<AddBookCardsPage> {
                             final List<DocumentSnapshot> documents =
                                 snapshot.data!.docs;
                             print("OKK1");
-                            var tagList = <String>["English"];
-                            var _selectedValue = "English";
+                            var tagList = <String>[""];
                             for (var value in documents) {
                               tagList.add(value['tag']);
                             }
@@ -149,6 +148,7 @@ class _AddBookCardsPageState extends State<AddBookCardsPage> {
                                 setState(() {
                                   _selectedValue = value!;
                                   print(value);
+                                  print(_selectedValue);
                                   tagText = _selectedValue;
                                   print("OKK2");
                                 });
