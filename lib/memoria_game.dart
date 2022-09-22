@@ -21,32 +21,29 @@ import './recommendation.dart';
 import './screen_transition.dart';
 import './setting.dart';
 
-class Memoria_Game extends StatefulWidget {
+class MemoriaGame extends StatefulWidget {
   final User user;
-  final List<List> wordlist;
-  Memoria_Game(this.user, this.wordlist);
+  final DocumentSnapshot<Object?> bookInfo;
+  final String? tag;
+  MemoriaGame(this.user, this.bookInfo, this.tag);
   @override
-  _Memoria_GameState createState() => _Memoria_GameState();
+  _MemoriaGameState createState() => _MemoriaGameState();
 }
 
-class _Memoria_GameState extends State<Memoria_Game> {
+class _MemoriaGameState extends State<MemoriaGame> {
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        appBar: AppBar(title: Text('Memoria Game'), actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.logout),
-            onPressed: () {
-              Navigator.of(context).pushReplacement(
-                MaterialPageRoute(builder: (context) {
-                  return BookShelf(widget.user);
-                }),
-              );
-            },
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.bookInfo['name'] + '【' + widget.tag + '】'),
+      ),
+      body: Center(
+        child: Container(
+          padding: EdgeInsets.all(16),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[],
           ),
-        ]),
-        //body: _screens[_selectedIndex],
+        ),
       ),
     );
   }

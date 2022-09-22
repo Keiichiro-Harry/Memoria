@@ -25,10 +25,11 @@ class _Slidable extends StatefulWidget {
   final List<DocumentSnapshot<Object?>> documents;
   final int index;
   final User user;
-  const _Slidable({
+  _Slidable({
     required this.documents,
     required this.index,
     required this.user,
+    // required this._selectedValue,
     Key? key,
   }) : super(key: key);
 
@@ -37,6 +38,8 @@ class _Slidable extends StatefulWidget {
 }
 
 class __SlidableState extends State<_Slidable> {
+  String tagText = '';
+  var _selectedValue = "";
   @override
   Widget build(BuildContext context) {
     return Slidable(
@@ -85,11 +88,11 @@ class __SlidableState extends State<_Slidable> {
           setState(() {
             //ここ逆だと、一瞬removeAtで消えたやつの次のやつが間違って消される。
             //documentsで消しても大元が消えてないから
-            FirebaseFirestore.instance
-                .collection('books')
-                .doc(widget.documents[widget.index].id)
-                .delete();
-            widget.documents.removeAt(widget.index);
+            //FirebaseFirestore.instance
+            // .collection('books')
+            // .doc(widget.documents[widget.index].id)
+            // .delete();危ないから消しとく
+            //widget.documents.removeAt(widget.index);
             ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('message cannot dismissed')));
           });
@@ -124,10 +127,10 @@ class __SlidableState extends State<_Slidable> {
           SlidableAction(
             // (3)
             onPressed: (_) {
-              FirebaseFirestore.instance
-                  .collection('books')
-                  .doc(widget.documents[widget.index].id)
-                  .delete();
+              //FirebaseFirestore.instance
+              // .collection('books')
+              // .doc(widget.documents[widget.index].id)
+              // .delete();危ないから消しとく
             },
             backgroundColor: const Color.fromARGB(255, 48, 89, 115), // (4)
             foregroundColor: const Color.fromARGB(255, 239, 126, 86),
@@ -137,35 +140,36 @@ class __SlidableState extends State<_Slidable> {
         ],
       ),
       child: Card(
-        // child: Column(
-        //   mainAxisSize: MainAxisSize.min,
-        //   children: <Widget>[
-        //     ListTile(
-        //       leading: Image.network(
-        //           'https://images-na.ssl-images-amazon.com/images/I/51HRqCnj7SL._SX344_BO1,204,203,200_.jpg'),
-        //       title: Text('完訳 7つの習慣~人格主義の回復~'),
-        //       subtitle: Text('送料無料'),
-        //     ),
-        //     Row(
-        //       mainAxisAlignment: MainAxisAlignment.end,
-        //       children: <Widget>[
-        //         TextButton(
-        //           child: const Text('詳細'),
-        //           onPressed: () {/* ... */},
-        //         ),
-        //         const SizedBox(width: 8),
-        //         TextButton(
-        //           child: const Text('今すぐ購入'),
-        //           onPressed: () {/* ... */},
-        //         ),
-        //         const SizedBox(width: 8),
-        //       ],
-        //     ),
-        //   ],
-        // ),
+          // child: Column(
+          //   mainAxisSize: MainAxisSize.min,
+          //   children: <Widget>[
+          //     ListTile(
+          //       leading: Image.network(
+          //           'https://images-na.ssl-images-amazon.com/images/I/51HRqCnj7SL._SX344_BO1,204,203,200_.jpg'),
+          //       title: Text('完訳 7つの習慣~人格主義の回復~'),
+          //       subtitle: Text('送料無料'),
+          //     ),
+          //     Row(
+          //       mainAxisAlignment: MainAxisAlignment.end,
+          //       children: <Widget>[
+          //         TextButton(
+          //           child: const Text('詳細'),
+          //           onPressed: () {/* ... */},
+          //         ),
+          //         const SizedBox(width: 8),
+          //         TextButton(
+          //           child: const Text('今すぐ購入'),
+          //           onPressed: () {/* ... */},
+          //         ),
+          //         const SizedBox(width: 8),
+          //       ],
+          //     ),
+          //   ],
+          // ),
 
-        //TODO ここでエラー
-        child: widget.documents[widget.index]['email'] != null
+          //TODO ここでエラー
+          child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
+        widget.documents[widget.index]['email'] != null
             ? ListTile(
                 onTap: () async {
                   // 投稿画面に遷移
@@ -180,19 +184,129 @@ class __SlidableState extends State<_Slidable> {
                 title: Text(widget.documents[widget.index]['name']),
                 subtitle: Text(widget.documents[widget.index]['comment']),
                 // 自分の投稿メッセージの場合は削除ボタンを表示
-                trailing:
-                    widget.documents[widget.index]['email'] == widget.user.email
-                        ? IconButton(
-                            icon: const Icon(Icons.thumb_up),
-                            onPressed: () async {
-                              // 投稿メッセージのドキュメントを削除
-                              // await FirebaseFirestore.instance
-                              //     .collection('posts')
-                              //     .doc(documents[index].id)
-                              //     .delete();
-                            },
-                          )
-                        : null)
+                leading: IconButton(
+                  icon: const Icon(Icons.thumb_up),
+                  onPressed: () async {},
+                ),
+                trailing: widget.documents[widget.index]['email'] ==
+                        widget.user.email
+                    ? IconButton(
+                        icon: const Icon(Icons.verified),
+                        onPressed: () async {
+                          // 投稿メッセージのドキュメントを削除
+                          // await FirebaseFirestore.instance
+                          //     .collection('posts')
+                          //     .doc(documents[index].id)
+                          //     .delete();
+
+//
+                          await showDialog<int>(
+                              context: context,
+                              barrierDismissible: false, //ここ？
+                              builder: (BuildContext context) {
+                                return StatefulBuilder(
+                                    //できた！！！https://stackoverflow.com/questions/51962272/how-to-refresh-an-alertdialog-in-flutter
+                                    builder: (context, setState) {
+                                  return AlertDialog(
+                                    title: Text(
+                                        widget.documents[widget.index]['name']),
+                                    content: Flexible(
+                                      child: StreamBuilder<QuerySnapshot>(
+                                          stream: FirebaseFirestore.instance
+                                              .collection('books')
+                                              .doc(widget
+                                                  .documents[widget.index].id)
+                                              .collection(
+                                                  widget.documents[widget.index]
+                                                      ['name'])
+                                              .orderBy('date')
+                                              // .endBefore(["中枢神経", "questoion"])
+                                              .snapshots(),
+                                          builder: (context, snapshot) {
+                                            if (snapshot.hasData) {
+                                              if (snapshot.data != null) {
+                                                final List<DocumentSnapshot>
+                                                    documents =
+                                                    snapshot.data!.docs;
+                                                // print("OKK1");
+                                                var tagList = <String>[""];
+                                                tagList.add(
+                                                    'All'); //???なんかよくわからんけど空白とallがいる
+                                                for (var value in documents) {
+                                                  tagList.add(value['tag']);
+                                                }
+                                                // tagList.toSet().toList();
+                                                tagList =
+                                                    tagList.toSet().toList();
+                                                print(tagList);
+                                                print(_selectedValue);
+                                                var tagText = "";
+                                                return DropdownButton<String>(
+                                                  value: _selectedValue,
+                                                  items: tagList
+                                                      .map((String list) =>
+                                                          DropdownMenuItem(
+                                                              value: list,
+                                                              child:
+                                                                  Text(list)))
+                                                      .toList(),
+                                                  onChanged: (String? value) {
+                                                    setState(() {
+                                                      _selectedValue = value!;
+                                                      print(value);
+                                                      print(_selectedValue);
+                                                      tagText = _selectedValue;
+                                                      print("OKK2");
+                                                    });
+                                                  },
+                                                );
+                                              } else {
+                                                return Container();
+                                              }
+                                            }
+                                            return const Center(
+                                              child: Text('読み込み中...'),
+                                            );
+                                          }),
+                                    ),
+                                    actions: <Widget>[
+                                      // ボタン領域
+                                      // TextButton(
+                                      //   child: Text("Cancel"),
+                                      //   onPressed: () => Navigator.pop(context),
+                                      // ),
+                                      TextButton(
+                                        child: Text("Cancel"),
+                                        onPressed: () => Navigator.pop(context),
+                                      ),
+                                      TextButton(
+                                        child: Text("Game Start"),
+                                        onPressed: () async {
+                                          // 投稿画面に遷移
+                                          if (_selectedValue != "") {
+                                            await Navigator.of(context).push(
+                                              MaterialPageRoute(
+                                                  builder: (context) {
+                                                return MemoriaGame(
+                                                    widget.user,
+                                                    widget.documents[
+                                                        widget.index],
+                                                    _selectedValue);
+                                              }),
+                                            );
+                                          }
+                                        },
+                                      ),
+                                    ],
+                                  );
+                                });
+
+                                //   }),
+                                // );
+                              });
+                        },
+                      )
+                    : null)
             : ListTile(
                 onTap: () async {
                   // 投稿画面に遷移
@@ -207,10 +321,14 @@ class __SlidableState extends State<_Slidable> {
                 title: Text(widget.documents[widget.index]['name']),
                 subtitle: Text(widget.documents[widget.index]['comment']),
                 // 自分の投稿メッセージの場合は削除ボタンを表示
+                leading: IconButton(
+                  icon: const Icon(Icons.thumb_up),
+                  onPressed: () async {},
+                ),
                 trailing:
                     widget.documents[widget.index]['email'] == widget.user.email
                         ? IconButton(
-                            icon: const Icon(Icons.thumb_up),
+                            icon: const Icon(Icons.verified),
                             onPressed: () async {
                               // 投稿メッセージのドキュメントを削除
                               // await FirebaseFirestore.instance
@@ -221,7 +339,7 @@ class __SlidableState extends State<_Slidable> {
                           )
                         : null,
               ),
-      ),
+      ])),
     );
   }
 }
@@ -230,6 +348,7 @@ class BookShelf extends StatefulWidget {
   BookShelf(this.user);
   // ユーザー情報
   final User user;
+  // var _selectedValue = "";
   @override
   State<BookShelf> createState() => _BookShelfState();
 }
@@ -273,6 +392,7 @@ class _BookShelfState extends State<BookShelf> {
                           documents: documents,
                           index: index,
                           user: widget.user,
+                          // _selectedValue: '',
                         );
                       },
 

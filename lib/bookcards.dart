@@ -220,6 +220,37 @@ builder: (context, snapshot) {
                             ),
                             child: Card(
                                 child: ListTile(
+                                    onTap: () async {
+                                      // 投稿画面に遷移
+                                      // await Navigator.of(context).push(
+                                      //   MaterialPageRoute(builder: (context) {
+                                      //
+                                      await showDialog<int>(
+                                          context: context,
+                                          barrierDismissible: false,
+                                          builder: (BuildContext context) {
+                                            return AlertDialog(
+                                              title: Text(
+                                                  documents[index]['question']),
+                                              content: Text(
+                                                  documents[index]['answer']),
+                                              actions: <Widget>[
+                                                // ボタン領域
+                                                // TextButton(
+                                                //   child: Text("Cancel"),
+                                                //   onPressed: () => Navigator.pop(context),
+                                                // ),
+                                                TextButton(
+                                                  child: Text("OK"),
+                                                  onPressed: () =>
+                                                      Navigator.pop(context),
+                                                ),
+                                              ],
+                                            );
+                                            //   }),
+                                            // );
+                                          });
+                                    },
                                     //leading: documents[index]['image'],
                                     title: Text(documents[index]['question']),
                                     subtitle: Text(documents[index]['comment'] +
