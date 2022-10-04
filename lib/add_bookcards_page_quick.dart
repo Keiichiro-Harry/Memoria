@@ -22,20 +22,22 @@ import './setting.dart';
 
 //https://zenn.dev/maropook/articles/4bfa59b464520c
 
-class AddBookCardsPage extends StatefulWidget {
-  AddBookCardsPage(this.user, this.bookInfo);
+class AddBookCardsPageQuick extends StatefulWidget {
+  AddBookCardsPageQuick(this.user, this.bookInfo);
   final User user;
   final DocumentSnapshot<Object?> bookInfo;
 
   @override
-  _AddBookCardsPageState createState() => _AddBookCardsPageState();
+  _AddBookCardsPageQuickState createState() => _AddBookCardsPageQuickState();
 }
 
-class _AddBookCardsPageState extends State<AddBookCardsPage> {
-  String questionText = '';
-  String answerText = '';
+class _AddBookCardsPageQuickState extends State<AddBookCardsPageQuick> {
+  // List<String> questionText = [];
+  // List<String> answerText = [];
   String nameText = '';
-  String commentText = '';
+  // List<String> commentText = [];
+  String originalText = '';
+  late List<Map> quizList = [];
   String tagText = '';
   String newTagText = '';
   var _selectedValue = ""; //ここに移動させたらちゃんと反映されるようになった！
@@ -79,38 +81,14 @@ class _AddBookCardsPageState extends State<AddBookCardsPage> {
               //   },
               // ),
               TextFormField(
-                decoration: InputDecoration(labelText: '問題'),
+                decoration: InputDecoration(labelText: '問題:答え:コメント'),
                 // 複数行のテキスト入力
                 keyboardType: TextInputType.multiline,
                 // 最大3行
                 maxLines: 3,
                 onChanged: (String value) {
                   setState(() {
-                    questionText = value;
-                  });
-                },
-              ),
-              TextFormField(
-                decoration: InputDecoration(labelText: '答え'),
-                // 複数行のテキスト入力
-                keyboardType: TextInputType.multiline,
-                // 最大3行
-                maxLines: 3,
-                onChanged: (String value) {
-                  setState(() {
-                    answerText = value;
-                  });
-                },
-              ),
-              TextFormField(
-                decoration: InputDecoration(labelText: 'コメント'),
-                // 複数行のテキスト入力
-                keyboardType: TextInputType.multiline,
-                // 最大3行
-                maxLines: 3,
-                onChanged: (String value) {
-                  setState(() {
-                    commentText = value;
+                    originalText = value;
                   });
                 },
               ),
@@ -189,23 +167,27 @@ class _AddBookCardsPageState extends State<AddBookCardsPage> {
                         DateTime.now().toLocal().toIso8601String(); // 現在の日時
                     final email = widget.user.email; // AddPostPage のデータを参照
                     // 投稿メッセージ用ドキュメント作成
-                    await FirebaseFirestore.instance
-                        .collection('books') // コレクションID指定
-                        .doc(widget.bookInfo.id)
-                        .collection(widget.bookInfo['name'])
-                        .doc() // ドキュメントID自動生成
-                        .set({
-                      // 'question': questionText,
-                      // 'answer': answerText,
-                      'email': email,
-                      'comment': commentText,
-                      'tag': newTagText != "" ? newTagText : tagText,
-                      'date': date,
-                      'isChecked': false,
-                      'question': questionText,
-                      'answer': answerText,
-                      'stage': 1,
-                    });
+                    quizList = await getData(originalText);
+                    for (var value in quizList) {
+                      await FirebaseFirestore.instance
+                          .collection('books') // コレクションID指定
+                          .doc(widget.bookInfo.id)
+                          .collection(widget.bookInfo['name'])
+                          .doc() // ドキュメントID自動生成
+                          .set({
+                        // 'question': questionText,
+                        // 'answer': answerText,
+                        'email': email,
+                        'comment': value['comment'],
+                        'tag': newTagText != "" ? newTagText : tagText,
+                        'date': date,
+                        'isChecked': false,
+                        'question': value['question'],
+                        'answer': value["answer"],
+                        'stage': 1,
+                      });
+                      print(value);
+                    }
                     // 1つ前の画面に戻る
                     Navigator.of(context).pop();
                   },
@@ -217,4 +199,58 @@ class _AddBookCardsPageState extends State<AddBookCardsPage> {
       ),
     );
   }
+}
+
+class Quiz {
+  String question;
+  String answer;
+  String comment;
+
+  Map<String, dynamic> toMap() {
+    return {
+      'question': question,
+      'answer': answer,
+      'comment': comment,
+    };
+  }
+
+  Quiz(
+    this.question,
+    this.answer,
+    this.comment,
+  );
+}
+
+Future<List<Map>> getData(String original) async {
+  List<Map> quizList = [];
+  // String csv = await rootBundle.loadString(path);
+  for (String line in original.split("\n")) {
+    if (quizList.length == original.split("\n").length) {
+      //ここquiz.length+1にしてたら最後改行必須みたいになる
+      break;
+    }
+    List rows = [];
+    var count = 0;
+    print("OK");
+    for (var i = 1; i < line.split('').length; i++) {
+      print("OK!");
+      if (line.substring(i, i + 1) == ":" ||
+          line.substring(i, i + 1) == ";" ||
+          line.substring(i, i + 1) == "：") {
+        rows.add(line.substring(count, i));
+        count = i + 1;
+      }
+      print(rows);
+    }
+    rows.add(line.substring(count, line.length));
+    Quiz quiz = Quiz(
+      rows[0],
+      rows[1],
+      rows[2],
+    );
+    print("OK3");
+    quizList.add(quiz.toMap());
+  }
+  print(quizList);
+  return quizList;
 }

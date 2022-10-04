@@ -63,12 +63,12 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyBW7Xqi4MmT9kTdZWvdAGrenr4PnygEKmg',
-    appId: '1:1083590062244:ios:db9b7258612bb7ed537631',
+    appId: '1:1083590062244:ios:8e343def45aa5aa1537631',
     messagingSenderId: '1083590062244',
     projectId: 'memoria-1e7c2',
     storageBucket: 'memoria-1e7c2.appspot.com',
-    iosClientId: '1083590062244-lvii6ags2r21n1r75ucshj64d8eq0vqt.apps.googleusercontent.com',
-    iosBundleId: 'com.example.memoria',
+    iosClientId: '1083590062244-tumq8cv0n013orneduiu1ci72lgan9cp.apps.googleusercontent.com',
+    iosBundleId: 'com.gmail.memoria',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(

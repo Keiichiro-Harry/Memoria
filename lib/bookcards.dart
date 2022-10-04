@@ -11,6 +11,7 @@ import 'package:get/get.dart';
 import './account.dart';
 import './add_book_page.dart';
 import './add_bookcards_page.dart';
+import './add_bookcards_page_quick.dart';
 import './add_post_page.dart';
 import './assignments.dart';
 import './bookcards.dart';
@@ -378,16 +379,56 @@ builder: (context, snapshot) {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add),
-        onPressed: () async {
-          // 投稿画面に遷移
-          await Navigator.of(context).push(
-            MaterialPageRoute(builder: (context) {
-              return AddBookCardsPage(widget.user, widget.bookInfo);
-            }),
-          );
-        },
+      // floatingActionButton: FloatingActionButton(
+      //   child: Icon(Icons.add),
+      //   onPressed: () async {
+      //     // 投稿画面に遷移
+      //     await Navigator.of(context).push(
+      //       MaterialPageRoute(builder: (context) {
+      //         return AddBookCardsPage(widget.user, widget.bookInfo);
+      //       }),
+      //     );
+      //   },
+      // ),
+      floatingActionButton: Column(
+        verticalDirection: VerticalDirection.up, // childrenの先頭が下に配置されます。
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          // 1つ目のFAB
+          FloatingActionButton(
+            // 参考※3よりユニークな名称をつけましょう。ないとエラーになります。
+            // There are multiple heroes that share the same tag within a subtree.
+            heroTag: "normal",
+            child: Icon(Icons.add),
+            // backgroundColor: Colors.blue[200],
+            onPressed: () async {
+              // 投稿画面に遷移
+              await Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) {
+                  return AddBookCardsPage(widget.user, widget.bookInfo);
+                }),
+              );
+            },
+          ),
+          // 2つ目のFAB
+          Container(
+            // 余白を設けるためContainerでラップします。
+            margin: EdgeInsets.only(bottom: 16.0),
+            child: FloatingActionButton(
+              // 参考※3よりユニークな名称をつけましょう。ないとエラーになります。
+              heroTag: "quick",
+              child: Icon(Icons.bolt),
+              // backgroundColor: Colors.pink[200],
+              onPressed: () async {
+                await Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) {
+                    return AddBookCardsPageQuick(widget.user, widget.bookInfo);
+                  }),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
