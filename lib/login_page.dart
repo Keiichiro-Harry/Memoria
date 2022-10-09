@@ -112,8 +112,8 @@ class _LoginPageState extends State<LoginPage> {
                       final result = await auth.signInWithEmailAndPassword(
                         // email: email,
                         // password: password,
-                        email: "keiichiroharry884@gmail.com",
-                        password: "Keiichiro884@",
+                        email: email,
+                        password: password,
                       );
                       // ログインに成功した場合
                       // チャット画面に遷移＋ログイン画面を破棄

@@ -232,6 +232,8 @@ class __SlidableState extends State<_Slidable> {
                                                 var tagList = <String>[""];
                                                 tagList.add(
                                                     'All'); //???なんかよくわからんけど空白とallがいる
+                                                // List<String> tagList = [];
+                                                // tagList.add("All");
                                                 for (var value in documents) {
                                                   tagList.add(value['tag']);
                                                 }

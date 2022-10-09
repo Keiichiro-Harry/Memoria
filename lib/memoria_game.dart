@@ -27,7 +27,7 @@ import 'dart:math' as math;
 class MemoriaGame extends StatefulWidget {
   final User user;
   final DocumentSnapshot<Object?> bookInfo;
-  final String? tag;
+  final String tag;
   MemoriaGame(this.user, this.bookInfo, this.tag);
   @override
   _MemoriaGameState createState() => _MemoriaGameState();
@@ -54,53 +54,85 @@ class _MemoriaGameState extends State<MemoriaGame> {
     });
     // print("OKquiz");
 
-    if (typedLength == splittedAnswer[quizNumber].length - 1) {
-      if (int.parse(selectionsAndAnswer[quizNumber][typedLength][4]) ==
-          typedAnswerKey) {
+    // if (typedLength == splittedAnswer[quizNumber].length - 1) {
+    //   //最後の文字だったら
+    //   if (int.parse(selectionsAndAnswer[quizNumber][typedLength][4]) ==
+    //       typedAnswerKey) {
+    //     //正解してたら
+    //     result++;
+    //     typedLength++;
+    //     print(splittedAnswer);
+    //     print(typedLength);
+    //     print("ok1");
+    //   }
+    //   print("ok2");
+    //   // await Future.delayed(const Duration(seconds: 1));
+    //   setState(() {
+    //     typedLength = 0;
+    //     quizNumber++;
+    //   });
+    // } else {
+    //   //最後の文字じゃなかったら
+    //   if (int.parse(selectionsAndAnswer[quizNumber][typedLength][4]) !=
+    //           typedAnswerKey &&
+    //       quizNumber != originalQuizList.length - 1) {
+    //     //typedlengthを既に+1しているから⇨訂正済み
+    //     print(int.parse(selectionsAndAnswer[quizNumber][typedLength][4]));
+    //     typedLength = selectionsAndAnswer[quizNumber].length;
+    //     setState(() {
+    //       typedLength = 0;
+    //       quizNumber++;
+    //       print("ok3");
+    //     });
+    //     // await Future.delayed(const Duration(seconds: 1));
+    //   } else if (quizNumber == originalQuizList.length - 1) {
+    //     await goToResult(context, originalQuizList, result);
+    //   } else {
+    //     setState(() {
+    //       typedLength++;
+    //     });
+    //   }
+    //   if (splittedAnswer[quizNumber][typedLength] == ' ') {
+    //     typedLength++;
+    //   }
+    //   print("ok4");
+    // }
+    bool A = originalQuizList.length - 1 == quizNumber;
+    bool B = int.parse(selectionsAndAnswer[quizNumber][typedLength][4]) ==
+        typedAnswerKey;
+    bool C = typedLength == splittedAnswer[quizNumber].length - 1;
+    if (A && (B == false || (B && C))) {
+      if (B) {
         result++;
-        typedLength++;
-        print(splittedAnswer);
-        print(typedLength);
-        print("ok1");
+        print("here1");
       }
-      print("ok2");
-      // await Future.delayed(const Duration(seconds: 1));
-      setState(() {
-        typedLength = 0;
-        quizNumber++;
-      });
+      await goToResult(context, originalQuizList, result);
+    } else if (B && C == false) {
+      typedLength++;
+      print("here2");
+    } else if (B) {
+      result++;
+      typedLength = 0;
+      quizNumber++;
+      print("here3");
     } else {
-      if (int.parse(selectionsAndAnswer[quizNumber][typedLength][4]) !=
-          typedAnswerKey) {
-        //typedlengthを既に+1しているから⇨訂正済み
-        print(int.parse(selectionsAndAnswer[quizNumber][typedLength][4]));
-        typedLength = selectionsAndAnswer[quizNumber].length;
-        setState(() {
-          typedLength = 0;
-          quizNumber++;
-          print("ok3");
-        });
-        // await Future.delayed(const Duration(seconds: 1));
-      } else {
-        setState(() {
-          typedLength++;
-        });
-      }
-      if (splittedAnswer[quizNumber][typedLength] == ' ') {
-        typedLength++;
-      }
-      print("ok4");
+      typedLength = 0;
+      quizNumber++;
+      print("here4");
+    }
+    if (splittedAnswer[quizNumber][typedLength] == ' ') {
+      typedLength++;
     }
 
     // await Future.delayed(const Duration(seconds: 1));
     isSelectNow = true;
     setState(() {});
     // typedLength++;
-    if (quizNumber == originalQuizList.length) {
-      // await goToResult(context, originalQuizList, result);
-      print("OKquiz");
-      await goToResult(context, originalQuizList, result);
-    }
+    // if (quizNumber == originalQuizList.length - 1) {
+    //   // await goToResult(context, originalQuizList, result);
+    //   print("OKquiz");
+    //   await goToResult(context, originalQuizList, result);
+    // }
     setState(() {});
   }
 
@@ -194,111 +226,405 @@ class _MemoriaGameState extends State<MemoriaGame> {
 
   Widget build(BuildContext context) {
     return Flexible(
-      child: StreamBuilder<QuerySnapshot>(
-          stream: FirebaseFirestore.instance
-              .collection('books')
-              .doc(widget.bookInfo.id)
-              .collection(widget.bookInfo['name'])
-              .orderBy('date')
-              // .endBefore(["中枢神経", "questoion"])
-              .snapshots(),
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              if (snapshot.data != null) {
-                final Iterable<QueryDocumentSnapshot<Object?>> documents =
-                    snapshot.data!.docs;
-                // print("OKK1");
-                // var tagList = <String>[""];
-                // List<String> thisAnswer = [];
-                if (count == 0) {
-                  for (var value in documents) {
-                    // thisAnswer.add(value["answer"]);
-                    originalQuizList.add([
-                      value['question'],
-                      value['answer']
-                      // thisAnswer[thisAnswer.length - 1].split(''), //ここあやしい
-                      // thisAnswer
-                    ]);
-                    // print(splittedAnswer);
-                    splittedAnswer.add(
-                        originalQuizList[originalQuizList.length - 1][1]
-                            .split(''));
+      child: widget.tag == 'All'
+          ? StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection('books')
+                  .doc(widget.bookInfo.id)
+                  .collection(widget.bookInfo['name'])
+                  .orderBy('date')
+                  // .endBefore(["中枢神経", "questoion"])
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  if (snapshot.data != null) {
+                    final Iterable<QueryDocumentSnapshot<Object?>> documents =
+                        snapshot.data!.docs;
+                    // print("OKK1");
+                    // var tagList = <String>[""];
+                    // List<String> thisAnswer = [];
+                    if (count == 0) {
+                      for (var value in documents) {
+                        // thisAnswer.add(value["answer"]);
+                        originalQuizList.add([
+                          value['question'],
+                          value['answer']
+                          // thisAnswer[thisAnswer.length - 1].split(''), //ここあやしい
+                          // thisAnswer
+                        ]);
+                        // print(splittedAnswer);
+                        splittedAnswer.add(
+                            originalQuizList[originalQuizList.length - 1][1]
+                                .split(''));
+                      }
+                      // print("OKquiz");
+                      // splittedAnswer.removeAt(0);
+                      // originalQuizList.removeAt(0);
+                      // selectionsAndAnswer.removeAt(0);
+                      selectionsAndAnswer = quizGenerator(splittedAnswer);
+                      count++;
+                    }
+                    // print("OKquiz");
+                    // tagList.toSet().toList();
+                    // tagList = tagList.toSet().toList();
+                    // print(tagList);
+                    return Scaffold(
+                      appBar: AppBar(
+                        title: Text(
+                            widget.bookInfo['name'] + '【' + widget.tag + '】'),
+                      ),
+                      body: quizNumber < originalQuizList.length
+                          ? CustomScrollView(
+                              slivers: <Widget>[
+                                SliverList(
+                                    delegate: SliverChildListDelegate([
+                                  Padding(
+                                      padding: EdgeInsets.only(
+                                          top: MediaQuery.of(context)
+                                                  .size
+                                                  .height /
+                                              4)),
+                                  Text(
+                                    originalQuizList[quizNumber][0],
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 30,
+                                      color: Theme.of(context).primaryColor,
+                                    ),
+                                  ),
+                                  Text(
+                                    originalQuizList[quizNumber][1]
+                                        .substring(0, typedLength),
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 20,
+                                      color: Theme.of(context).primaryColor,
+                                    ),
+                                  ),
+                                  Container(
+                                    height: 80,
+                                  ),
+                                ])),
+                                SliverList(
+                                    delegate: SliverChildBuilderDelegate(
+                                  (context, key) {
+                                    return ClipRRect(
+                                        borderRadius: BorderRadius.circular(4),
+                                        child: Column(
+                                            // mainAxisSize: MainAxisSize.min,
+                                            children: <Widget>[
+                                              Stack(
+                                                alignment: Alignment.center,
+                                                children: <Widget>[
+                                                  // Positioned.fill(
+                                                  // child:
+                                                  Container(
+                                                    height: 40,
+                                                    width: 40,
+                                                    decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              10),
+                                                      gradient:
+                                                          const LinearGradient(
+                                                        colors: <Color>[
+                                                          Color(0xFF0D47A1),
+                                                          Color(0xFF1976D2),
+                                                          Color(0xFF42A5F5),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  // ),
+                                                  TextButton(
+                                                      style:
+                                                          TextButton.styleFrom(
+                                                        foregroundColor:
+                                                            Colors.white,
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(16.0),
+                                                        textStyle:
+                                                            const TextStyle(
+                                                                fontSize: 20),
+                                                      ),
+                                                      onPressed: () async {
+                                                        if (!isSelectNow)
+                                                          return;
+                                                        await updateQuiz(
+                                                            context, key);
+                                                      },
+                                                      child: isSelectNow ||
+                                                              typedLength !=
+                                                                  originalQuizList[quizNumber]
+                                                                      .length
+                                                          ? Text(selectionsAndAnswer[quizNumber]
+                                                                  [typedLength]
+                                                              [key])
+                                                          : selectionsAndAnswer[quizNumber]
+                                                                          [typedLength]
+                                                                      [key] ==
+                                                                  key
+                                                              ? Text(selectionsAndAnswer[quizNumber]
+                                                                          [typedLength]
+                                                                      [key] +
+                                                                  "○")
+                                                              : Text(selectionsAndAnswer[quizNumber]
+                                                                          [typedLength]
+                                                                      [key] +
+                                                                  "×")),
+                                                ],
+                                              ),
+                                            ]));
+                                    // //
+                                    // TextButton(
+                                    //     style: TextButton.styleFrom(
+                                    //       foregroundColor: Colors.white,
+                                    //       padding: const EdgeInsets.all(16.0),
+                                    //       textStyle: const TextStyle(fontSize: 20),
+                                    //     ),
+                                    //     onPressed: () async {
+                                    //       if (!isSelectNow) return;
+                                    //       await updateQuiz(context, key);
+                                    //     },
+                                    //     child: isSelectNow ||
+                                    //             typedLength !=
+                                    //                 originalQuizList[quizNumber]
+                                    //                     .length
+                                    //         ? Text(selectionsAndAnswer[quizNumber]
+                                    //             [typedLength][key])
+                                    //         : selectionsAndAnswer[quizNumber]
+                                    //                     [typedLength][key] ==
+                                    //                 key
+                                    //             ? Text(
+                                    //                 selectionsAndAnswer[quizNumber]
+                                    //                         [typedLength][key] +
+                                    //                     "○")
+                                    //             : Text(
+                                    //                 selectionsAndAnswer[quizNumber]
+                                    //                         [typedLength][key] +
+                                    //                     "×"));
+                                    // //
+                                  },
+                                  childCount: 4,
+                                )),
+                              ],
+                            )
+                          : Container(),
+                    );
+                  } else {
+                    return Container();
                   }
-                  // print("OKquiz");
-                  // splittedAnswer.removeAt(0);
-                  // originalQuizList.removeAt(0);
-                  // selectionsAndAnswer.removeAt(0);
-                  selectionsAndAnswer = quizGenerator(splittedAnswer);
-                  count++;
                 }
-                // print("OKquiz");
-                // tagList.toSet().toList();
-                // tagList = tagList.toSet().toList();
-                // print(tagList);
-                return Scaffold(
-                  appBar: AppBar(
-                    title:
-                        Text(widget.bookInfo['name'] + '【' + widget.tag + '】'),
-                  ),
-                  body: quizNumber < originalQuizList.length
-                      ? CustomScrollView(
-                          slivers: <Widget>[
-                            SliverList(
-                                delegate: SliverChildListDelegate([
-                              Padding(
-                                  padding: EdgeInsets.only(
-                                      top: MediaQuery.of(context).size.height /
-                                          3)),
-                              Text(
-                                originalQuizList[quizNumber][0],
-                                textAlign: TextAlign.center,
-                              ),
-                              Text(
-                                originalQuizList[quizNumber][1]
-                                    .substring(0, typedLength),
-                                textAlign: TextAlign.center,
-                              )
-                            ])),
-                            SliverList(
-                                delegate: SliverChildBuilderDelegate(
-                              (context, key) {
-                                return TextButton(
-                                    onPressed: () async {
-                                      if (!isSelectNow) return;
-                                      await updateQuiz(context, key);
-                                    },
-                                    child: isSelectNow ||
-                                            typedLength !=
-                                                originalQuizList[quizNumber]
-                                                    .length
-                                        ? Text(selectionsAndAnswer[quizNumber]
-                                            [typedLength][key])
-                                        : selectionsAndAnswer[quizNumber]
-                                                    [typedLength][key] ==
-                                                key
-                                            ? Text(
-                                                selectionsAndAnswer[quizNumber]
-                                                        [typedLength][key] +
-                                                    "○")
-                                            : Text(
-                                                selectionsAndAnswer[quizNumber]
-                                                        [typedLength][key] +
-                                                    "×"));
-                              },
-                              childCount: 4,
-                            )),
-                          ],
-                        )
-                      : Container(),
+                return const Center(
+                  child: Text('読み込み中...'),
                 );
-              } else {
-                return Container();
-              }
-            }
-            return const Center(
-              child: Text('読み込み中...'),
-            );
-          }),
+              })
+          : StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection('books')
+                  .doc(widget.bookInfo.id)
+                  .collection(widget.bookInfo['name'])
+                  // .where("tag","==", widget.tag)
+                  .orderBy('date')
+                  // .endBefore(["中枢神経", "questoion"])
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  if (snapshot.data != null) {
+                    final Iterable<QueryDocumentSnapshot<Object?>> documents =
+                        snapshot.data!.docs;
+                    print("OKK1");
+                    // var tagList = <String>[""];
+                    // List<String> thisAnswer = [];
+                    if (count == 0) {
+                      for (var value in documents) {
+                        // thisAnswer.add(value["answer"]);
+                        if (value["tag"] == widget.tag) {
+                          originalQuizList.add([
+                            value['question'],
+                            value['answer']
+                            // thisAnswer[thisAnswer.length - 1].split(''), //ここあやしい
+                            // thisAnswer
+                          ]);
+
+                          // print(splittedAnswer);
+                          splittedAnswer.add(
+                              originalQuizList[originalQuizList.length - 1][1]
+                                  .split(''));
+                        }
+                      }
+                      print("OKquiz");
+                      // splittedAnswer.removeAt(0);
+                      // originalQuizList.removeAt(0);
+                      // selectionsAndAnswer.removeAt(0);
+                      selectionsAndAnswer = quizGenerator(splittedAnswer);
+                      count++;
+                    }
+                    // print("OKquiz");
+                    // tagList.toSet().toList();
+                    // tagList = tagList.toSet().toList();
+                    //print(tagList);
+                    return Scaffold(
+                      appBar: AppBar(
+                        title: Text(
+                            widget.bookInfo['name'] + '【' + widget.tag + '】'),
+                      ),
+                      body: quizNumber < originalQuizList.length
+                          ? CustomScrollView(
+                              slivers: <Widget>[
+                                SliverList(
+                                    delegate: SliverChildListDelegate([
+                                  Padding(
+                                      padding: EdgeInsets.only(
+                                          top: MediaQuery.of(context)
+                                                  .size
+                                                  .height /
+                                              4)),
+                                  Text(
+                                    originalQuizList[quizNumber][0],
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 30,
+                                      color: Theme.of(context).primaryColor,
+                                    ),
+                                  ),
+                                  Text(
+                                    originalQuizList[quizNumber][1]
+                                        .substring(0, typedLength),
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 20,
+                                      color: Theme.of(context).primaryColor,
+                                    ),
+                                  ),
+                                  Container(
+                                    height: 80,
+                                  ),
+                                ])),
+                                SliverList(
+                                    delegate: SliverChildBuilderDelegate(
+                                  (context, key) {
+                                    return ClipRRect(
+                                        borderRadius: BorderRadius.circular(4),
+                                        child: Column(
+                                            // mainAxisSize: MainAxisSize.min,
+                                            children: <Widget>[
+                                              Stack(
+                                                alignment: Alignment.center,
+                                                children: <Widget>[
+                                                  // Positioned.fill(
+                                                  // child:
+                                                  Container(
+                                                    height: 40,
+                                                    width: 40,
+                                                    decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              10),
+                                                      gradient:
+                                                          const LinearGradient(
+                                                        colors: <Color>[
+                                                          Color(0xFF0D47A1),
+                                                          Color(0xFF1976D2),
+                                                          Color(0xFF42A5F5),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  // ),
+                                                  TextButton(
+                                                      style:
+                                                          TextButton.styleFrom(
+                                                        foregroundColor:
+                                                            Colors.white,
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(16.0),
+                                                        textStyle:
+                                                            const TextStyle(
+                                                                fontSize: 20),
+                                                      ),
+                                                      onPressed: () async {
+                                                        if (!isSelectNow)
+                                                          return;
+                                                        print("here");
+                                                        await updateQuiz(
+                                                            context, key);
+                                                        print(typedLength);
+                                                        print(quizNumber);
+                                                        print(originalQuizList);
+                                                      },
+                                                      child: isSelectNow ||
+                                                              typedLength !=
+                                                                  originalQuizList[quizNumber]
+                                                                      .length
+                                                          ? Text(selectionsAndAnswer[quizNumber]
+                                                                  [typedLength]
+                                                              [key])
+                                                          : selectionsAndAnswer[quizNumber]
+                                                                          [typedLength]
+                                                                      [key] ==
+                                                                  key
+                                                              ? Text(selectionsAndAnswer[quizNumber]
+                                                                          [typedLength]
+                                                                      [key] +
+                                                                  "○")
+                                                              : Text(selectionsAndAnswer[quizNumber]
+                                                                          [typedLength]
+                                                                      [key] +
+                                                                  "×")),
+                                                ],
+                                              ),
+                                            ]));
+                                    // //
+                                    // TextButton(
+                                    //     style: TextButton.styleFrom(
+                                    //       foregroundColor: Colors.white,
+                                    //       padding: const EdgeInsets.all(16.0),
+                                    //       textStyle: const TextStyle(fontSize: 20),
+                                    //     ),
+                                    //     onPressed: () async {
+                                    //       if (!isSelectNow) return;
+                                    //       await updateQuiz(context, key);
+                                    //     },
+                                    //     child: isSelectNow ||
+                                    //             typedLength !=
+                                    //                 originalQuizList[quizNumber]
+                                    //                     .length
+                                    //         ? Text(selectionsAndAnswer[quizNumber]
+                                    //             [typedLength][key])
+                                    //         : selectionsAndAnswer[quizNumber]
+                                    //                     [typedLength][key] ==
+                                    //                 key
+                                    //             ? Text(
+                                    //                 selectionsAndAnswer[quizNumber]
+                                    //                         [typedLength][key] +
+                                    //                     "○")
+                                    //             : Text(
+                                    //                 selectionsAndAnswer[quizNumber]
+                                    //                         [typedLength][key] +
+                                    //                     "×"));
+                                    // //
+                                  },
+                                  childCount: 4,
+                                )),
+                              ],
+                            )
+                          : Container(),
+                    );
+                  } else {
+                    return Container();
+                  }
+                }
+                return const Center(
+                  child: Text('読み込み中...'),
+                );
+              }),
     );
   }
 }

@@ -42,7 +42,7 @@ class _AddBookCardsPageQuickState extends State<AddBookCardsPageQuick> {
   String newTagText = '';
   var _selectedValue = ""; //ここに移動させたらちゃんと反映されるようになった！
   var isSelectedItem = "None";
-
+  ScrollController _scrollController = ScrollController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -80,17 +80,20 @@ class _AddBookCardsPageQuickState extends State<AddBookCardsPageQuick> {
               //     });
               //   },
               // ),
-              TextFormField(
-                decoration: InputDecoration(labelText: '問題:答え:コメント'),
-                // 複数行のテキスト入力
-                keyboardType: TextInputType.multiline,
-                // 最大3行
-                maxLines: 3,
-                onChanged: (String value) {
-                  setState(() {
-                    originalText = value;
-                  });
-                },
+              Scrollbar(
+                controller: _scrollController,
+                child: TextFormField(
+                  decoration: InputDecoration(labelText: '問題:答え:コメント'),
+                  // 複数行のテキスト入力
+                  keyboardType: TextInputType.multiline,
+                  // 最大3行
+                  maxLines: 3,
+                  onChanged: (String value) {
+                    setState(() {
+                      originalText = value;
+                    });
+                  },
+                ),
               ),
 
               Row(children: <Widget>[
@@ -236,18 +239,15 @@ Future<List<Map>> getData(String original) async {
       print("OK!");
       if (line.substring(i, i + 1) == ":" ||
           line.substring(i, i + 1) == ";" ||
-          line.substring(i, i + 1) == "：") {
+          line.substring(i, i + 1) == "：" ||
+          line.substring(i, i + 1) == "；") {
         rows.add(line.substring(count, i));
         count = i + 1;
       }
       print(rows);
     }
     rows.add(line.substring(count, line.length));
-    Quiz quiz = Quiz(
-      rows[0],
-      rows[1],
-      rows[2],
-    );
+    Quiz quiz = Quiz(rows[0], rows[1], rows[2] ?? '');
     print("OK3");
     quizList.add(quiz.toMap());
   }
