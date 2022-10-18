@@ -36,6 +36,7 @@ class _LoginPageState extends State<LoginPage> {
   // 入力したメールアドレス・パスワード
   String email = '';
   String password = '';
+  String nickname = '';
 
   @override
   Widget build(BuildContext context) {
@@ -64,6 +65,15 @@ class _LoginPageState extends State<LoginPage> {
                   });
                 },
               ),
+              // TextFormField(
+              //   decoration: InputDecoration(labelText: 'ニックネーム'),
+              //   obscureText: true,
+              //   onChanged: (String value) {
+              //     setState(() {
+              //       nickname = value;
+              //     });
+              //   },
+              // ),
               Container(
                 padding: EdgeInsets.all(8),
                 // メッセージ表示

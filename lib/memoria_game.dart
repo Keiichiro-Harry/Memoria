@@ -101,8 +101,8 @@ class _MemoriaGameState extends State<MemoriaGame> {
     bool B = int.parse(selectionsAndAnswer[quizNumber][typedLength][4]) ==
         typedAnswerKey;
     bool C = typedLength == splittedAnswer[quizNumber].length - 1;
-    if (A && (B == false || (B && C))) {
-      if (B) {
+    if (A && (B == false || ((B || typedAnswerKey == 4) && C))) {
+      if (B || typedAnswerKey == 4) {
         result++;
         print("here1");
       }
@@ -110,7 +110,7 @@ class _MemoriaGameState extends State<MemoriaGame> {
     } else if (B && C == false) {
       typedLength++;
       print("here2");
-    } else if (B) {
+    } else if (B || typedAnswerKey == 4) {
       result++;
       typedLength = 0;
       quizNumber++;
@@ -120,7 +120,10 @@ class _MemoriaGameState extends State<MemoriaGame> {
       quizNumber++;
       print("here4");
     }
-    if (splittedAnswer[quizNumber][typedLength] == ' ') {
+    if (splittedAnswer[quizNumber][typedLength] == ' ' ||
+        splittedAnswer[quizNumber][typedLength] == '/' ||
+        splittedAnswer[quizNumber][typedLength] == '・' ||
+        splittedAnswer[quizNumber][typedLength] == '、') {
       typedLength++;
     }
 
@@ -252,6 +255,7 @@ class _MemoriaGameState extends State<MemoriaGame> {
                           // thisAnswer[thisAnswer.length - 1].split(''), //ここあやしい
                           // thisAnswer
                         ]);
+                        // originalQuizList.shuffle();
                         // print(splittedAnswer);
                         splittedAnswer.add(
                             originalQuizList[originalQuizList.length - 1][1]
@@ -356,25 +360,23 @@ class _MemoriaGameState extends State<MemoriaGame> {
                                                         await updateQuiz(
                                                             context, key);
                                                       },
-                                                      child: isSelectNow ||
-                                                              typedLength !=
-                                                                  originalQuizList[quizNumber]
-                                                                      .length
-                                                          ? Text(selectionsAndAnswer[quizNumber]
-                                                                  [typedLength]
-                                                              [key])
-                                                          : selectionsAndAnswer[quizNumber]
-                                                                          [typedLength]
-                                                                      [key] ==
-                                                                  key
-                                                              ? Text(selectionsAndAnswer[quizNumber]
-                                                                          [typedLength]
-                                                                      [key] +
-                                                                  "○")
-                                                              : Text(selectionsAndAnswer[quizNumber]
-                                                                          [typedLength]
-                                                                      [key] +
-                                                                  "×")),
+                                                      child: key != 4
+                                                          ? Text(selectionsAndAnswer[
+                                                                  quizNumber][
+                                                              typedLength][key])
+                                                          // : selectionsAndAnswer[quizNumber]
+                                                          //                 [typedLength]
+                                                          //             [key] ==
+                                                          //         key
+                                                          //     ? Text(selectionsAndAnswer[quizNumber]
+                                                          //                 [typedLength]
+                                                          //             [key] +
+                                                          //         "○")
+                                                          //     : Text(selectionsAndAnswer[quizNumber]
+                                                          //                 [typedLength]
+                                                          //             [key] +
+                                                          //         "×")),
+                                                          : Text("OK")),
                                                 ],
                                               ),
                                             ]));
@@ -408,7 +410,7 @@ class _MemoriaGameState extends State<MemoriaGame> {
                                     //                     "×"));
                                     // //
                                   },
-                                  childCount: 4,
+                                  childCount: 5,
                                 )),
                               ],
                             )
@@ -449,7 +451,7 @@ class _MemoriaGameState extends State<MemoriaGame> {
                             // thisAnswer[thisAnswer.length - 1].split(''), //ここあやしい
                             // thisAnswer
                           ]);
-
+                          // originalQuizList.shuffle();
                           // print(splittedAnswer);
                           splittedAnswer.add(
                               originalQuizList[originalQuizList.length - 1][1]
@@ -559,25 +561,23 @@ class _MemoriaGameState extends State<MemoriaGame> {
                                                         print(quizNumber);
                                                         print(originalQuizList);
                                                       },
-                                                      child: isSelectNow ||
-                                                              typedLength !=
-                                                                  originalQuizList[quizNumber]
-                                                                      .length
-                                                          ? Text(selectionsAndAnswer[quizNumber]
-                                                                  [typedLength]
-                                                              [key])
-                                                          : selectionsAndAnswer[quizNumber]
-                                                                          [typedLength]
-                                                                      [key] ==
-                                                                  key
-                                                              ? Text(selectionsAndAnswer[quizNumber]
-                                                                          [typedLength]
-                                                                      [key] +
-                                                                  "○")
-                                                              : Text(selectionsAndAnswer[quizNumber]
-                                                                          [typedLength]
-                                                                      [key] +
-                                                                  "×")),
+                                                      child: key != 4
+                                                          ? Text(selectionsAndAnswer[
+                                                                  quizNumber][
+                                                              typedLength][key])
+                                                          // : selectionsAndAnswer[quizNumber]
+                                                          //                 [typedLength]
+                                                          //             [key] ==
+                                                          //         key
+                                                          //     ? Text(selectionsAndAnswer[quizNumber]
+                                                          //                 [typedLength]
+                                                          //             [key] +
+                                                          //         "○")
+                                                          //     : Text(selectionsAndAnswer[quizNumber]
+                                                          //                 [typedLength]
+                                                          //             [key] +
+                                                          //         "×")),
+                                                          : Text("OK")),
                                                 ],
                                               ),
                                             ]));
@@ -611,7 +611,7 @@ class _MemoriaGameState extends State<MemoriaGame> {
                                     //                     "×"));
                                     // //
                                   },
-                                  childCount: 4,
+                                  childCount: 5,
                                 )),
                               ],
                             )

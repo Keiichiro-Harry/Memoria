@@ -25,6 +25,7 @@ class Notifications extends StatefulWidget {
   Notifications(this.user);
   // ユーザー情報
   final User user;
+  // final String nickname;
   @override
   State<Notifications> createState() => _NotificationsState();
 }
@@ -168,11 +169,42 @@ class _NotificationsState extends State<Notifications> {
                               ],
                             ),
                             child: Card(
-                              child: documents[index]['text'] != null
+                              child: documents[index]['email'] != null
                                   ? ListTile(
+                                      onTap: () async {
+                                        // 投稿画面に遷移
+                                        // await Navigator.of(context).push(
+                                        //   MaterialPageRoute(builder: (context) {
+                                        //
+                                        await showDialog<int>(
+                                            context: context,
+                                            barrierDismissible: false,
+                                            builder: (BuildContext context) {
+                                              return AlertDialog(
+                                                // title: Text(
+                                                // documents[index]['question']),
+                                                content: Text(
+                                                    documents[index]['email']),
+                                                actions: <Widget>[
+                                                  // ボタン領域
+                                                  // TextButton(
+                                                  //   child: Text("Cancel"),
+                                                  //   onPressed: () => Navigator.pop(context),
+                                                  // ),
+                                                  TextButton(
+                                                    child: Text("OK"),
+                                                    onPressed: () =>
+                                                        Navigator.pop(context),
+                                                  ),
+                                                ],
+                                              );
+                                              //   }),
+                                              // );
+                                            });
+                                      },
                                       //leading: documents[index]['image'],
                                       title: Text(documents[index]['text']),
-                                      subtitle: Text(documents[index]['email']),
+                                      // subtitle: Text(widget.nickname),
                                       // 自分の投稿メッセージの場合は削除ボタンを表示
                                       trailing: documents[index]['email'] ==
                                               widget.user.email
@@ -188,9 +220,40 @@ class _NotificationsState extends State<Notifications> {
                                             )
                                           : null)
                                   : ListTile(
+                                      onTap: () async {
+                                        // 投稿画面に遷移
+                                        // await Navigator.of(context).push(
+                                        //   MaterialPageRoute(builder: (context) {
+                                        //
+                                        await showDialog<int>(
+                                            context: context,
+                                            barrierDismissible: false,
+                                            builder: (BuildContext context) {
+                                              return AlertDialog(
+                                                // title: Text(
+                                                // documents[index]['question']),
+                                                content: Text(
+                                                    documents[index]['email']),
+                                                actions: <Widget>[
+                                                  // ボタン領域
+                                                  // TextButton(
+                                                  //   child: Text("Cancel"),
+                                                  //   onPressed: () => Navigator.pop(context),
+                                                  // ),
+                                                  TextButton(
+                                                    child: Text("OK"),
+                                                    onPressed: () =>
+                                                        Navigator.pop(context),
+                                                  ),
+                                                ],
+                                              );
+                                              //   }),
+                                              // );
+                                            });
+                                      },
                                       //leading: documents[index]['image'],
                                       title: Text(documents[index]['text']),
-                                      subtitle: Text(documents[index]['email']),
+                                      // subtitle: Text(widget.nickname),
                                       // 自分の投稿メッセージの場合は削除ボタンを表示
                                       trailing: documents[index]['email'] ==
                                               widget.user.email
@@ -252,8 +315,39 @@ class _NotificationsState extends State<Notifications> {
                             ),
                             child: Card(
                               child: ListTile(
+                                  onTap: () async {
+                                    // 投稿画面に遷移
+                                    // await Navigator.of(context).push(
+                                    //   MaterialPageRoute(builder: (context) {
+                                    //
+                                    await showDialog<int>(
+                                        context: context,
+                                        barrierDismissible: false,
+                                        builder: (BuildContext context) {
+                                          return AlertDialog(
+                                            // title: Text(
+                                            // documents[index]['question']),
+                                            content:
+                                                Text(documents[index]['email']),
+                                            actions: <Widget>[
+                                              // ボタン領域
+                                              // TextButton(
+                                              //   child: Text("Cancel"),
+                                              //   onPressed: () => Navigator.pop(context),
+                                              // ),
+                                              TextButton(
+                                                child: Text("OK"),
+                                                onPressed: () =>
+                                                    Navigator.pop(context),
+                                              ),
+                                            ],
+                                          );
+                                          //   }),
+                                          // );
+                                        });
+                                  },
                                   title: Text(documents[index]['text']),
-                                  subtitle: Text(documents[index]['email']),
+                                  // subtitle: Text(widget.nickname),
                                   // 自分の投稿メッセージの場合は削除ボタンを表示
                                   trailing: documents[index]['email'] ==
                                           widget.user.email

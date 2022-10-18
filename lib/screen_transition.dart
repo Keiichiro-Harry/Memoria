@@ -31,6 +31,7 @@ class ScreenTransition extends StatefulWidget {
   late final List<Widget> _screens;
 
   final User user;
+  // final String nickname;
 
   ScreenTransition(this.user, {Key? key}) : super(key: key) {
     _screens = [

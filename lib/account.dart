@@ -39,50 +39,16 @@ class _AccountState extends State<Account> {
             padding: EdgeInsets.all(8),
             child: Text('ログイン情報：${widget.user.email}'),
           ),
-          Expanded(
-            // FutureBuilder
-            // 非同期処理の結果を元にWidgetを作れる
-            child: StreamBuilder<QuerySnapshot>(
-              // 投稿メッセージ一覧を取得（非同期処理）
-              // 投稿日時でソート
-              stream: FirebaseFirestore.instance
-                  .collection('posts')
-                  .orderBy('date')
-                  .snapshots(),
-              builder: (context, snapshot) {
-                // データが取得できた場合
-                if (snapshot.hasData) {
-                  final List<DocumentSnapshot> documents = snapshot.data!.docs;
-                  // 取得した投稿メッセージ一覧を元にリスト表示
-                  return ListView(
-                    children: documents.map((document) {
-                      return Card(
-                        child: ListTile(
-                          title: Text(document['text']),
-                          subtitle: Text(document['email']),
-                          // 自分の投稿メッセージの場合は削除ボタンを表示
-                          trailing: document['email'] == widget.user.email
-                              ? IconButton(
-                                  icon: Icon(Icons.delete),
-                                  onPressed: () async {
-                                    // 投稿メッセージのドキュメントを削除
-                                    await FirebaseFirestore.instance
-                                        .collection('posts')
-                                        .doc(document.id)
-                                        .delete();
-                                  },
-                                )
-                              : null,
-                        ),
-                      );
-                    }).toList(),
-                  );
-                }
-                // データが読込中の場合
-                return Center(
-                  child: Text('読込中...'),
-                );
-              },
+          Container(
+            height: 50,
+            child: const Text('設定',
+                style: TextStyle(color: Colors.white, fontSize: 32.0)),
+            alignment: Alignment.center,
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                  begin: Alignment.topRight,
+                  end: Alignment.bottomLeft,
+                  colors: [Colors.blue, Colors.white]),
             ),
           ),
         ],

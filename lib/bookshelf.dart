@@ -169,7 +169,8 @@ class __SlidableState extends State<_Slidable> {
 
           //TODO ここでエラー
           child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
-        widget.documents[widget.index]['email'] != null
+        widget.documents[widget.index]['email'] ==
+                widget.user.email //元々!=nullにしてた
             ? ListTile(
                 onTap: () async {
                   // 投稿画面に遷移
@@ -207,100 +208,221 @@ class __SlidableState extends State<_Slidable> {
                                 return StatefulBuilder(
                                     //できた！！！https://stackoverflow.com/questions/51962272/how-to-refresh-an-alertdialog-in-flutter
                                     builder: (context, setState) {
-                                  return AlertDialog(
-                                    title: Text(
-                                        widget.documents[widget.index]['name']),
-                                    content: Flexible(
-                                      child: StreamBuilder<QuerySnapshot>(
-                                          stream: FirebaseFirestore.instance
-                                              .collection('books')
-                                              .doc(widget
-                                                  .documents[widget.index].id)
-                                              .collection(
-                                                  widget.documents[widget.index]
-                                                      ['name'])
-                                              .orderBy('date')
-                                              // .endBefore(["中枢神経", "questoion"])
-                                              .snapshots(),
-                                          builder: (context, snapshot) {
-                                            if (snapshot.hasData) {
-                                              if (snapshot.data != null) {
-                                                final List<DocumentSnapshot>
-                                                    documents =
-                                                    snapshot.data!.docs;
-                                                // print("OKK1");
-                                                var tagList = <String>[""];
-                                                tagList.add(
-                                                    'All'); //???なんかよくわからんけど空白とallがいる
-                                                // List<String> tagList = [];
-                                                // tagList.add("All");
-                                                for (var value in documents) {
-                                                  tagList.add(value['tag']);
-                                                }
-                                                // tagList.toSet().toList();
-                                                tagList =
-                                                    tagList.toSet().toList();
-                                                print(tagList);
-                                                print(_selectedValue);
-                                                var tagText = "";
-                                                return DropdownButton<String>(
-                                                  value: _selectedValue,
-                                                  items: tagList
-                                                      .map((String list) =>
-                                                          DropdownMenuItem(
-                                                              value: list,
-                                                              child:
-                                                                  Text(list)))
-                                                      .toList(),
-                                                  onChanged: (String? value) {
-                                                    setState(() {
-                                                      _selectedValue = value!;
-                                                      print(value);
+                                  return Dialog(
+                                      child: Container(
+                                    // alignment:
+                                    width: 400,
+                                    height: 200,
+                                    child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                              widget.documents[widget.index]
+                                                  ['name'],
+                                              style: TextStyle(fontSize: 30)),
+                                          Flexible(
+                                            child: StreamBuilder<QuerySnapshot>(
+                                                stream: FirebaseFirestore
+                                                    .instance
+                                                    .collection('books')
+                                                    .doc(widget
+                                                        .documents[widget.index]
+                                                        .id)
+                                                    .collection(widget
+                                                            .documents[
+                                                        widget.index]['name'])
+                                                    .orderBy('date')
+                                                    // .endBefore(["中枢神経", "questoion"])
+                                                    .snapshots(),
+                                                builder: (context, snapshot) {
+                                                  if (snapshot.hasData) {
+                                                    if (snapshot.data != null) {
+                                                      final List<
+                                                              DocumentSnapshot>
+                                                          documents =
+                                                          snapshot.data!.docs;
+                                                      // print("OKK1");
+                                                      var tagList = <String>[
+                                                        ""
+                                                      ];
+                                                      tagList.add(
+                                                          'All'); //???なんかよくわからんけど空白とallがいる
+                                                      // List<String> tagList = [];
+                                                      // tagList.add("All");
+                                                      for (var value
+                                                          in documents) {
+                                                        tagList
+                                                            .add(value['tag']);
+                                                      }
+                                                      // tagList.toSet().toList();
+                                                      tagList = tagList
+                                                          .toSet()
+                                                          .toList();
+                                                      print(tagList);
                                                       print(_selectedValue);
-                                                      tagText = _selectedValue;
-                                                      print("OKK2");
-                                                    });
-                                                  },
-                                                );
-                                              } else {
-                                                return Container();
-                                              }
-                                            }
-                                            return const Center(
-                                              child: Text('読み込み中...'),
-                                            );
-                                          }),
-                                    ),
-                                    actions: <Widget>[
-                                      // ボタン領域
-                                      // TextButton(
-                                      //   child: Text("Cancel"),
-                                      //   onPressed: () => Navigator.pop(context),
+                                                      var tagText = "";
+                                                      return DropdownButton<
+                                                          String>(
+                                                        value: _selectedValue,
+                                                        items: tagList
+                                                            .map((String
+                                                                    list) =>
+                                                                DropdownMenuItem(
+                                                                    value: list,
+                                                                    child: Text(
+                                                                        list)))
+                                                            .toList(),
+                                                        onChanged:
+                                                            (String? value) {
+                                                          setState(() {
+                                                            _selectedValue =
+                                                                value!;
+                                                            print(value);
+                                                            print(
+                                                                _selectedValue);
+                                                            tagText =
+                                                                _selectedValue;
+                                                            print("OKK2");
+                                                          });
+                                                        },
+                                                      );
+                                                    } else {
+                                                      return Container();
+                                                    }
+                                                  }
+                                                  return const Center(
+                                                    child: Text('読み込み中...'),
+                                                  );
+                                                }),
+                                          ),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              TextButton(
+                                                child: Text("Cancel"),
+                                                onPressed: () =>
+                                                    Navigator.pop(context),
+                                              ),
+                                              TextButton(
+                                                child: Text("Game Start"),
+                                                onPressed: () async {
+                                                  // 投稿画面に遷移
+                                                  if (_selectedValue != "") {
+                                                    await Navigator.of(context)
+                                                        .push(
+                                                      MaterialPageRoute(
+                                                          builder: (context) {
+                                                        return MemoriaGame(
+                                                            widget.user,
+                                                            widget.documents[
+                                                                widget.index],
+                                                            _selectedValue);
+                                                      }),
+                                                    );
+                                                  }
+                                                },
+                                              ),
+                                            ],
+                                          )
+                                        ]),
+                                  )
+                                      // title: Text(
+                                      //     widget.documents[widget.index]['name']),
+                                      // content: Flexible(
+                                      //   child: StreamBuilder<QuerySnapshot>(
+                                      //       stream: FirebaseFirestore.instance
+                                      //           .collection('books')
+                                      //           .doc(widget
+                                      //               .documents[widget.index].id)
+                                      //           .collection(
+                                      //               widget.documents[widget.index]
+                                      //                   ['name'])
+                                      //           .orderBy('date')
+                                      //           // .endBefore(["中枢神経", "questoion"])
+                                      //           .snapshots(),
+                                      //       builder: (context, snapshot) {
+                                      //         if (snapshot.hasData) {
+                                      //           if (snapshot.data != null) {
+                                      //             final List<DocumentSnapshot>
+                                      //                 documents =
+                                      //                 snapshot.data!.docs;
+                                      //             // print("OKK1");
+                                      //             var tagList = <String>[""];
+                                      //             tagList.add(
+                                      //                 'All'); //???なんかよくわからんけど空白とallがいる
+                                      //             // List<String> tagList = [];
+                                      //             // tagList.add("All");
+                                      //             for (var value in documents) {
+                                      //               tagList.add(value['tag']);
+                                      //             }
+                                      //             // tagList.toSet().toList();
+                                      //             tagList =
+                                      //                 tagList.toSet().toList();
+                                      //             print(tagList);
+                                      //             print(_selectedValue);
+                                      //             var tagText = "";
+                                      //             return DropdownButton<String>(
+                                      //               value: _selectedValue,
+                                      //               items: tagList
+                                      //                   .map((String list) =>
+                                      //                       DropdownMenuItem(
+                                      //                           value: list,
+                                      //                           child:
+                                      //                               Text(list)))
+                                      //                   .toList(),
+                                      //               onChanged: (String? value) {
+                                      //                 setState(() {
+                                      //                   _selectedValue = value!;
+                                      //                   print(value);
+                                      //                   print(_selectedValue);
+                                      //                   tagText = _selectedValue;
+                                      //                   print("OKK2");
+                                      //                 });
+                                      //               },
+                                      //             );
+                                      //           } else {
+                                      //             return Container();
+                                      //           }
+                                      //         }
+                                      //         return const Center(
+                                      //           child: Text('読み込み中...'),
+                                      //         );
+                                      //       }),
                                       // ),
-                                      TextButton(
-                                        child: Text("Cancel"),
-                                        onPressed: () => Navigator.pop(context),
-                                      ),
-                                      TextButton(
-                                        child: Text("Game Start"),
-                                        onPressed: () async {
-                                          // 投稿画面に遷移
-                                          if (_selectedValue != "") {
-                                            await Navigator.of(context).push(
-                                              MaterialPageRoute(
-                                                  builder: (context) {
-                                                return MemoriaGame(
-                                                    widget.user,
-                                                    widget.documents[
-                                                        widget.index],
-                                                    _selectedValue);
-                                              }),
-                                            );
-                                          }
-                                        },
-                                      ),
-                                    ],
-                                  );
+                                      // actions: <Widget>[
+                                      //   // ボタン領域
+                                      //   // TextButton(
+                                      //   //   child: Text("Cancel"),
+                                      //   //   onPressed: () => Navigator.pop(context),
+                                      //   // ),
+                                      //   TextButton(
+                                      //     child: Text("Cancel"),
+                                      //     onPressed: () => Navigator.pop(context),
+                                      //   ),
+                                      //   TextButton(
+                                      //     child: Text("Game Start"),
+                                      //     onPressed: () async {
+                                      //       // 投稿画面に遷移
+                                      //       if (_selectedValue != "") {
+                                      //         await Navigator.of(context).push(
+                                      //           MaterialPageRoute(
+                                      //               builder: (context) {
+                                      //             return MemoriaGame(
+                                      //                 widget.user,
+                                      //                 widget.documents[
+                                      //                     widget.index],
+                                      //                 _selectedValue);
+                                      //           }),
+                                      //         );
+                                      //       }
+                                      //     },
+                                      //   ),
+                                      // ],
+                                      );
                                 });
 
                                 //   }),
@@ -309,38 +431,41 @@ class __SlidableState extends State<_Slidable> {
                         },
                       )
                     : null)
-            : ListTile(
-                onTap: () async {
-                  // 投稿画面に遷移
-                  await Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) {
-                      return BookCards(
-                          widget.user, widget.documents[widget.index]);
-                    }),
-                  );
-                },
-                //leading: documents[index]['image'],
-                title: Text(widget.documents[widget.index]['name']),
-                subtitle: Text(widget.documents[widget.index]['comment']),
-                // 自分の投稿メッセージの場合は削除ボタンを表示
-                leading: IconButton(
-                  icon: const Icon(Icons.thumb_up),
-                  onPressed: () async {},
-                ),
-                trailing:
-                    widget.documents[widget.index]['email'] == widget.user.email
-                        ? IconButton(
-                            icon: const Icon(Icons.verified),
-                            onPressed: () async {
-                              // 投稿メッセージのドキュメントを削除
-                              // await FirebaseFirestore.instance
-                              //     .collection('posts')
-                              //     .doc(documents[index].id)
-                              //     .delete();
-                            },
-                          )
-                        : null,
-              ),
+
+            // 他人のは表示しない
+            : Container()
+        // : ListTile(
+        //     onTap: () async {
+        //       // 投稿画面に遷移
+        //       await Navigator.of(context).push(
+        //         MaterialPageRoute(builder: (context) {
+        //           return BookCards(
+        //               widget.user, widget.documents[widget.index]);
+        //         }),
+        //       );
+        //     },
+        //     //leading: documents[index]['image'],
+        //     title: Text(widget.documents[widget.index]['name']),
+        //     subtitle: Text(widget.documents[widget.index]['comment']),
+        //     // 自分の投稿メッセージの場合は削除ボタンを表示
+        //     leading: IconButton(
+        //       icon: const Icon(Icons.thumb_up),
+        //       onPressed: () async {},
+        //     ),
+        //     trailing:
+        //         widget.documents[widget.index]['email'] == widget.user.email
+        //             ? IconButton(
+        //                 icon: const Icon(Icons.verified),
+        //                 onPressed: () async {
+        //                   // 投稿メッセージのドキュメントを削除
+        //                   // await FirebaseFirestore.instance
+        //                   //     .collection('posts')
+        //                   //     .doc(documents[index].id)
+        //                   //     .delete();
+        //                 },
+        //               )
+        //             : null,
+        //   ),
       ])),
     );
   }
