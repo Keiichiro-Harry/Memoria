@@ -42,10 +42,14 @@ class _BookCardsState extends State<BookCards> {
       ),
       body: Column(
         children: <Widget>[
-          Container(
-            padding: EdgeInsets.all(8),
-            child: Text('ログイン情報：${widget.user.email}'),
-          ),
+          widget.user.email != "guest@guest.com"
+              ? Container(
+                  padding: EdgeInsets.all(8),
+                  child: Text('ログイン情報：${widget.user.email}'),
+                )
+              : Container(
+                  padding: EdgeInsets.all(8),
+                ),
           Expanded(
             // FutureBuilder
             // 非同期処理の結果を元にWidgetを作れる

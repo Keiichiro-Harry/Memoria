@@ -35,10 +35,14 @@ class _AccountState extends State<Account> {
     return Scaffold(
       body: Column(
         children: <Widget>[
-          Container(
-            padding: EdgeInsets.all(8),
-            child: Text('ログイン情報：${widget.user.email}'),
-          ),
+          widget.user.email != "guest@guest.com"
+              ? Container(
+                  padding: EdgeInsets.all(8),
+                  child: Text('ログイン情報：${widget.user.email}'),
+                )
+              : Container(
+                  padding: EdgeInsets.all(8),
+                ),
           Container(
             height: 50,
             child: const Text('設定',
@@ -57,11 +61,13 @@ class _AccountState extends State<Account> {
         child: Icon(Icons.settings),
         onPressed: () async {
           // 投稿画面に遷移
-          await Navigator.of(context).push(
-            MaterialPageRoute(builder: (context) {
-              return Setting(widget.user);
-            }),
-          );
+          if (widget.user.email != "guest@guest.com") {
+            await Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) {
+                return Setting(widget.user);
+              }),
+            );
+          }
         },
       ),
     );

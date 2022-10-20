@@ -36,10 +36,14 @@ class _NotificationsState extends State<Notifications> {
     return Scaffold(
       body: Column(
         children: <Widget>[
-          Container(
-            padding: EdgeInsets.all(8),
-            child: Text('ログイン情報：${widget.user.email}'),
-          ),
+          widget.user.email != "guest@guest.com"
+              ? Container(
+                  padding: EdgeInsets.all(8),
+                  child: Text('ログイン情報：${widget.user.email}'),
+                )
+              : Container(
+                  padding: EdgeInsets.all(8),
+                ),
           Expanded(
             // FutureBuilder
             // 非同期処理の結果を元にWidgetを作れる
@@ -380,11 +384,13 @@ class _NotificationsState extends State<Notifications> {
         child: Icon(Icons.add),
         onPressed: () async {
           // 投稿画面に遷移
-          await Navigator.of(context).push(
-            MaterialPageRoute(builder: (context) {
-              return AddPostPage(widget.user);
-            }),
-          );
+          if (widget.user.email != "guest@guest.com") {
+            await Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) {
+                return AddPostPage(widget.user);
+              }),
+            );
+          }
         },
       ),
     );
